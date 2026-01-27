@@ -1,0 +1,46 @@
+$content = @'
+{% extends 'base.html' %}
+{% block title %}Status Pembayaran{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-credit-card"></i> Status Pembayaran</h5>
+                </div>
+                <div class="card-body p-4">
+                    <p><strong>Order ID:</strong> {{ payment.gateway_order_id }}</p>
+                    <p><strong>Jumlah:</strong> Rp {{ payment.total_amount|floatformat:0 }}</p>
+                    <p><strong>Status:</strong> 
+                        {% if payment.status == 'PAID' %}
+                            <span class="badge bg-success">Lunas</span>
+                        {% elif payment.status == 'PENDING' %}
+                            <span class="badge bg-warning">Pending</span>
+                        {% elif payment.status == 'EXPIRED' %}
+                            <span class="badge bg-secondary">Expired</span>
+                        {% elif payment.status == 'FAILED' %}
+                            <span class="badge bg-danger">Failed</span>
+                        {% endif %}
+                    </p>
+                    {% if payment.paid_at %}
+                        <p><strong>Tanggal Pembayaran:</strong> {{ payment.paid_at|date:"d F Y, H:i" }} WIB</p>
+                    {% endif %}
+                    <hr>
+                    <a href="{% url 'payments:instructions' payment.id %}" class="btn btn-primary">
+                        <i class="bi bi-arrow-left"></i> Kembali ke Instruksi
+                    </a>
+                    <a href="{% url 'registration:check_status' %}" class="btn btn-secondary">
+                        <i class="bi bi-search"></i> Cek Status Pendaftaran
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+'@
+
+New-Item -ItemType Directory -Force -Path templates\payments | Out-Null
+[System.IO.File]::WriteAllText("$PWD\templates\payments\status.html", $content, [System.Text.Encoding]::UTF8)
+Write-Host "status.html created!" -ForegroundColor Green

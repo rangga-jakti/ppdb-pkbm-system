@@ -1,0 +1,61 @@
+# Core Django
+Django==5.0.1
+psycopg2-binary==2.9.9
+
+# Environment & Configuration
+python-decouple==3.8
+django-environ==0.11.2
+
+# Database & ORM
+django-model-utils==4.3.1
+
+# Forms & Validation
+django-crispy-forms>=2.1
+crispy-bootstrap5>=2024.10
+
+# File Upload & Image Processing
+Pillow==10.2.0
+django-cleanup==8.0.0
+python-magic-bin==0.4.14
+
+# Security
+django-cors-headers==4.3.1
+django-csp==3.8
+
+# Timezone
+pytz==2024.1
+
+# Utilities
+python-slugify==8.0.1
+
+# Excel Export
+openpyxl==3.1.2
+
+# Midtrans vs Xendit - Pertimbangan Teknis:
+
+# MIDTRANS
+# Pros:
+# - Official library Python maintained
+# - Dokumentasi bahasa Indonesia lengkap
+# - Fee lebih rendah untuk VA Bank lokal
+# - Support semua bank major (BCA, Mandiri, BNI, BRI, Permata)
+# - Settlement langsung ke rekening yayasan
+
+# Cons:
+# - Dashboard agak kompleks untuk non-technical user
+
+# XENDIT
+# Pros:
+# - Dashboard lebih modern & user-friendly
+# - API lebih RESTful & consistent
+# - Support VA + QRIS + e-wallet
+
+# Cons:
+# - Official Python library kurang maintenance
+# - Fee lebih tinggi
+# - Harus build wrapper sendiri untuk beberapa fitur
+
+# REKOMENDASI: Gunakan Midtrans untuk PPDB karena:
+# 1. Fee lebih murah (penting untuk yayasan)
+# 2. VA Bank paling stabil
+# 3. Support resmi bagus

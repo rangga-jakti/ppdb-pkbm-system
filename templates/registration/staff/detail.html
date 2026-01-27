@@ -1,0 +1,320 @@
+@'
+{% extends "base.html" %}
+{% block title %}Detail Pendaftaran - {{ registration.registration_number }}{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-file-earmark-text"></i> Detail Pendaftaran</h2>
+                <div>
+                    <a href="{% url 'registration:staff_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Kembali ke List
+                    </a>
+                    <a href="{% url 'registration:staff_dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </div>
+            </div>
+            
+            <div class="row">
+                <!-- Left Column: Data Siswa -->
+                <div class="col-md-8">
+                    <!-- Status Badge -->
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-1">{{ registration.registration_number }}</h5>
+                                    <p class="text-muted mb-0">Tanggal Daftar: {{ registration.created_at|date:"d F Y, H:i" }} WIB</p>
+                                </div>
+                                <div>
+                                    {% if registration.status == "VERIFIED" %}
+                                        <span class="badge bg-success fs-5 px-4 py-2">DITERIMA</span>
+                                    {% elif registration.status == "PAID" %}
+                                        <span class="badge bg-warning text-dark fs-5 px-4 py-2">PERLU VERIFIKASI</span>
+                                    {% elif registration.status == "REJECTED" %}
+                                        <span class="badge bg-danger fs-5 px-4 py-2">DITOLAK</span>
+                                    {% elif registration.status == "SUBMITTED" %}
+                                        <span class="badge bg-info fs-5 px-4 py-2">MENUNGGU PEMBAYARAN</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary fs-5 px-4 py-2">{{ registration.get_status_display }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Pribadi -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="bi bi-person"></i> Data Pribadi</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Nama Lengkap:</strong><br>{{ registration.full_name }}</p>
+                                    <p><strong>NIK:</strong><br>{{ registration.nik }}</p>
+                                    {% if registration.nisn %}
+                                    <p><strong>NISN:</strong><br>{{ registration.nisn }}</p>
+                                    {% endif %}
+                                    <p><strong>Tempat, Tanggal Lahir:</strong><br>
+                                    {{ registration.birth_place }}, {{ registration.birth_date|date:"d F Y" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Jenis Kelamin:</strong><br>{{ registration.get_gender_display }}</p>
+                                    <p><strong>Agama:</strong><br>{{ registration.get_religion_display }}</p>
+                                    <p><strong>Email:</strong><br>{{ registration.contact_email }}</p>
+                                    <p><strong>No. HP:</strong><br>{{ registration.contact_phone }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Pendidikan -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="bi bi-building"></i> Data Pendidikan</h6>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Program Pilihan:</strong><br>
+                            <span class="badge bg-primary">{{ registration.get_program_choice_display }}</span></p>
+                            
+                            {% if registration.previous_school %}
+                            <p><strong>Asal Sekolah:</strong><br>{{ registration.previous_school }}</p>
+                            {% endif %}
+                            
+                            {% if registration.previous_school_npsn %}
+                            <p><strong>NPSN:</strong><br>{{ registration.previous_school_npsn }}</p>
+                            {% endif %}
+                            
+                            {% if registration.graduation_year %}
+                            <p><strong>Tahun Lulus:</strong><br>{{ registration.graduation_year }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Data Orang Tua -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="bi bi-people"></i> Data Orang Tua/Wali</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Nama Ayah:</strong><br>{{ registration.father_name }}</p>
+                                    <p><strong>Pekerjaan:</strong><br>{{ registration.father_occupation }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Nama Ibu:</strong><br>{{ registration.mother_name }}</p>
+                                    <p><strong>Pekerjaan:</strong><br>{{ registration.mother_occupation }}</p>
+                                </div>
+                            </div>
+                            <p><strong>No. HP Orang Tua:</strong><br>{{ registration.parent_phone }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Alamat -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="bi bi-geo-alt"></i> Alamat</h6>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Alamat Lengkap:</strong><br>{{ registration.address }}</p>
+                            <p><strong>Kota/Kabupaten:</strong> {{ registration.city }}<br>
+                            <strong>Provinsi:</strong> {{ registration.province }}
+                            {% if registration.postal_code %}<br><strong>Kode Pos:</strong> {{ registration.postal_code }}{% endif %}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Dokumen -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="bi bi-files"></i> Dokumen Terupload</h6>
+                        </div>
+                        <div class="card-body">
+                            {% if not documents_complete %}
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                <strong>Dokumen BELUM LENGKAP!</strong>
+                                <br>Dokumen yang masih kurang:
+                                <ul class="mb-0 mt-2">
+                                    {% for doc in missing_documents %}
+                                    <li>{{ doc }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-success">
+                                <i class="bi bi-check-circle"></i> Semua dokumen wajib sudah lengkap
+                            </div>
+                            {% endif %}
+                            
+                            {% if documents %}
+                            <div class="list-group">
+                                {% for doc in documents %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i class="bi bi-file-earmark-pdf text-danger fs-4"></i>
+                                            <strong class="ms-2">{{ doc.get_document_type_display }}</strong>
+                                            <br>
+                                            <small class="text-muted ms-5">
+                                                {{ doc.original_filename }} ({{ doc.file_size|filesizeformat }})
+                                            </small>
+                                        </div>
+                                        <div>
+                                            <a href="{{ doc.file.url }}" target="_blank" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-eye"></i> Lihat
+                                            </a>
+                                            <a href="{{ doc.file.url }}" download class="btn btn-sm btn-outline-secondary">
+                                                <i class="bi bi-download"></i> Download
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted mb-0">Belum ada dokumen yang diupload.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column: Payment & Actions -->
+                <div class="col-md-4">
+                    <!-- Payment Info -->
+                    {% if payment %}
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="bi bi-credit-card"></i> Informasi Pembayaran</h6>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Order ID:</strong><br>{{ payment.gateway_order_id }}</p>
+                            <p><strong>VA Number:</strong><br>{{ payment.va_number }}</p>
+                            <p><strong>Amount:</strong><br>
+                            <span class="fs-5 text-success">Rp {{ payment.total_amount|floatformat:0 }}</span></p>
+                            <p><strong>Status:</strong><br>
+                            {% if payment.status == "PAID" %}
+                                <span class="badge bg-success">LUNAS</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">{{ payment.get_status_display }}</span>
+                            {% endif %}
+                            </p>
+                            {% if payment.paid_at %}
+                            <p><strong>Tanggal Bayar:</strong><br>{{ payment.paid_at|date:"d/m/Y H:i" }} WIB</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Verification Status -->
+                    {% if registration.status in "VERIFIED,REJECTED" %}
+                    <div class="card mb-3 border-{% if registration.status == 'VERIFIED' %}success{% else %}danger{% endif %}">
+                        <div class="card-header bg-{% if registration.status == 'VERIFIED' %}success{% else %}danger{% endif %} text-white">
+                            <h6 class="mb-0">
+                                <i class="bi bi-{% if registration.status == 'VERIFIED' %}check-circle{% else %}x-circle{% endif %}"></i>
+                                Status Verifikasi
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Status:</strong><br>
+                            {% if registration.status == "VERIFIED" %}
+                                <span class="badge bg-success">DITERIMA</span>
+                            {% else %}
+                                <span class="badge bg-danger">DITOLAK</span>
+                            {% endif %}
+                            </p>
+                            <p><strong>Tanggal:</strong><br>{{ registration.verified_at|date:"d/m/Y H:i" }} WIB</p>
+                            <p><strong>Oleh:</strong><br>{{ registration.verified_by }}</p>
+                            {% if registration.verification_notes %}
+                            <p><strong>Catatan:</strong><br>{{ registration.verification_notes }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Verification Actions -->
+                    {% if registration.status == "PAID" %}
+                    <div class="card mb-3 border-warning">
+                        <div class="card-header bg-warning">
+                            <h6 class="mb-0"><i class="bi bi-shield-check"></i> Verifikasi Pendaftaran</h6>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="{% url 'registration:staff_verify' registration.id %}" id="verifyForm">
+                                {% csrf_token %}
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Catatan Verifikasi:</label>
+                                    <textarea name="verification_notes" class="form-control" rows="3" 
+                                              placeholder="Tambahkan catatan (opsional untuk approve, wajib untuk reject)"></textarea>
+                                </div>
+                                
+                                {% if not documents_complete %}
+                                <div class="alert alert-danger">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    <strong>PERINGATAN:</strong> Dokumen belum lengkap!
+                                </div>
+                                {% endif %}
+                                
+                                <div class="d-grid gap-2">
+                                    <button type="submit" name="action" value="approve" class="btn btn-success btn-lg"
+                                            onclick="return confirm('Setujui pendaftaran ini?')">
+                                        <i class="bi bi-check-circle"></i> APPROVE (TERIMA)
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-lg" onclick="rejectConfirm()">
+                                        <i class="bi bi-x-circle"></i> REJECT (TOLAK)
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Quick Info -->
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="bi bi-info-circle"></i> Quick Info</h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-2"><strong>Created:</strong> {{ registration.created_at|date:"d/m/Y H:i" }}</p>
+                            {% if registration.submitted_at %}
+                            <p class="mb-2"><strong>Submitted:</strong> {{ registration.submitted_at|date:"d/m/Y H:i" }}</p>
+                            {% endif %}
+                            {% if registration.verified_at %}
+                            <p class="mb-0"><strong>Verified:</strong> {{ registration.verified_at|date:"d/m/Y H:i" }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function rejectConfirm() {
+    const notes = document.querySelector('textarea[name="verification_notes"]').value.trim();
+    
+    if (!notes) {
+        alert('Alasan penolakan WAJIB diisi!');
+        return false;
+    }
+    
+    if (confirm('TOLAK pendaftaran ini?\n\nAlasan: ' + notes)) {
+        const form = document.getElementById('verifyForm');
+        const actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = 'reject';
+        form.appendChild(actionInput);
+        form.submit();
+    }
+}
+</script>
+{% endblock %}
+'@ | Out-File -FilePath templates\registration\staff\detail.html -Encoding UTF8
+
+Write-Host "detail.html created!" -ForegroundColor Green

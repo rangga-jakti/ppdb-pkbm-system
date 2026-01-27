@@ -1,0 +1,17 @@
+-r base.txt
+
+# WSGI Server
+gunicorn==21.2.0
+gevent==24.2.1
+
+# Background Tasks
+celery==5.3.6
+redis==5.0.1
+django-celery-beat==2.5.0
+
+# Monitoring & Logging
+sentry-sdk==1.39.2
+django-log-request-id==2.1.0
+
+# Performance
+django-redis==5.4.0

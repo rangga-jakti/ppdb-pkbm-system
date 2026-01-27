@@ -1,0 +1,131 @@
+Remove-Item templates\registration\check_status.html -Force
+
+@'
+{% extends "base.html" %}
+{% block title %}Cek Status Pendaftaran{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-search"></i> Cek Status Pendaftaran</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-4">Masukkan nomor pendaftaran dan salah satu identitas Anda untuk melihat status pendaftaran.</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="registration_number" class="form-label">
+                                Nomor Pendaftaran <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" name="registration_number" id="registration_number" 
+                                   class="form-control form-control-lg" 
+                                   placeholder="PPDB-2026-00001"
+                                   required>
+                            <small class="text-muted">Nomor yang Anda terima saat mendaftar</small>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="identifier" class="form-label">
+                                NISN / Email / No. HP <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" name="identifier" id="identifier" 
+                                   class="form-control form-control-lg" 
+                                   placeholder="Masukkan NISN atau Email atau No. HP"
+                                   required>
+                            <small class="text-muted">Untuk validasi identitas Anda</small>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-search"></i> Cek Status
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <p class="mb-2">Belum mendaftar?</p>
+                        <a href="{% url 'registration:create' %}" class="btn btn-success">
+                            <i class="bi bi-file-earmark-plus"></i> Daftar Sekarang
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- INFO CARD -->
+            <div class="card mt-4 border-info">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="bi bi-info-circle"></i> Informasi</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Simpan nomor pendaftaran Anda dengan baik</li>
+                        <li>Status akan otomatis terupdate setelah pembayaran diterima</li>
+                        <li>Jika ada kendala, hubungi panitia PPDB</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- CONTACT CARD -->
+            <div class="card mt-4 border-success">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0"><i class="bi bi-headset"></i> Butuh Bantuan?</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3"><strong>Hubungi Kami:</strong></p>
+                    
+                    <div class="d-grid gap-2">
+                        <!-- WhatsApp -->
+                        <a href="https://wa.me/{{ contact.whatsapp }}?text={{ contact.whatsapp_text|urlencode }}" 
+                        target="_blank" class="btn btn-success">
+                            <i class="bi bi-whatsapp"></i> Chat WhatsApp Admin
+                        </a>
+                        
+                        <!-- Email -->
+                        <a href="mailto:{{ contact.email }}" class="btn btn-outline-primary">
+                            <i class="bi bi-envelope"></i> Email: {{ contact.email }}
+                        </a>
+                        
+                        <!-- Telepon -->
+                        <a href="tel:+6281292127621" class="btn btn-outline-secondary">
+                            <i class="bi bi-telephone"></i> Telepon: 0812-9212-7621
+                        </a>
+                    </div>
+
+                    {% if error_highlight %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <strong>Data Tidak Ditemukan!</strong>
+                        <p class="mb-2">{{ error_message }}</p>
+                        <hr>
+                        <p class="mb-0 small">
+                            <strong>Tips:</strong><br>
+                            • Pastikan nomor pendaftaran benar (format: PPDB-2026-00001)<br>
+                            • Gunakan NIK/Email/No. HP yang sama saat mendaftar<br>
+                            • Jika masih bermasalah, <a href="#contact" class="alert-link">hubungi admin</a>
+                        </p>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endif %}
+                    
+                    <hr>
+                    
+                    <p class="text-muted mb-0 small">
+                        <i class="bi bi-clock"></i> <strong>Jam Operasional:</strong><br>
+                        Senin - Jumat: 08.00 - 16.00 WIB<br>
+                        Sabtu: 08.00 - 12.00 WIB
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+'@ | Out-File -FilePath templates\registration\check_status.html -Encoding UTF8
+
+Write-Host "check_status.html updated!" -ForegroundColor Green

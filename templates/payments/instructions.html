@@ -1,0 +1,157 @@
+
+{% extends "base.html" %}
+{% block title %}Instruksi Pembayaran{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i> Instruksi Pembayaran
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    
+                    {% if payment.status == "PAID" %}
+                    <!-- PAYMENT LUNAS -->
+                    <div class="alert alert-success text-center py-4">
+                        <i class="bi bi-check-circle-fill" style="font-size: 3rem;"></i>
+                        <h4 class="mt-3">Pembayaran Lunas!</h4>
+                        <p class="mb-0">Terima kasih, pembayaran Anda telah diterima.</p>
+                        <hr>
+                        <p class="mb-0">
+                            <strong>Tanggal Bayar:</strong> {{ payment.paid_at|date:"d F Y, H:i" }} WIB
+                        </p>
+                    </div>
+                    
+                    <a href="{% url 'registration:check_status' %}" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Cek Status Pendaftaran
+                    </a>
+                    
+                    {% else %}
+                    <!-- PAYMENT PENDING -->
+                    <div class="alert alert-warning">
+                        <i class="bi bi-clock"></i>
+                        <strong>Status:</strong> Menunggu Pembayaran
+                    </div>
+                    
+                    <!-- NOMOR VA -->
+                    <h6 class="mb-3">Nomor Virtual Account:</h6>
+                    <div class="text-center bg-light p-4 rounded mb-4 border border-primary">
+                        <h3 class="text-primary mb-2 font-monospace">{{ payment.va_number }}</h3>
+                        <p class="text-muted mb-2">{{ payment.get_payment_method_display }}</p>
+                        <button class="btn btn-sm btn-outline-primary" onclick="copyVA()">
+                            <i class="bi bi-clipboard"></i> Salin Nomor VA
+                        </button>
+                    </div>
+                    
+                    <!-- JUMLAH BAYAR -->
+                    <h6 class="mb-3">Jumlah yang Harus Dibayar:</h6>
+                    <div class="text-center bg-light p-3 rounded mb-4 border border-success">
+                        <h4 class="text-success mb-0">Rp {{ payment.total_amount|floatformat:0 }}</h4>
+                    </div>
+                    
+                    <!-- INFO NO EXPIRY -->
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Informasi Penting:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Nomor VA <strong>tetap aktif</strong> sampai Anda melakukan pembayaran</li>
+                            <li>Silakan lakukan pembayaran sesuai kemampuan Anda</li>
+                            <li>Status akan otomatis terupdate setelah pembayaran berhasil</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- CARA PEMBAYARAN -->
+                    <h6 class="mb-3"><i class="bi bi-list-ol"></i> Cara Pembayaran:</h6>
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <ol class="mb-0">
+                                <li class="mb-2">Buka aplikasi mobile banking atau kunjungi ATM</li>
+                                <li class="mb-2">Pilih menu <strong>Transfer</strong> → <strong>Virtual Account</strong></li>
+                                <li class="mb-2">Masukkan nomor VA: 
+                                    <strong class="text-primary">{{ payment.va_number }}</strong>
+                                </li>
+                                <li class="mb-2">Masukkan nominal: 
+                                    <strong class="text-success">Rp {{ payment.total_amount|floatformat:0 }}</strong>
+                                </li>
+                                <li class="mb-2">Konfirmasi detail transaksi</li>
+                                <li>Selesaikan pembayaran</li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <!-- TESTING MODE NOTICE (if dummy VA) -->
+                    {% if payment.gateway_response.mode == "TESTING_MODE" %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Mode Testing</strong>
+                        <p class="mb-0 mt-2">
+                            Sistem dalam mode testing. Untuk simulasi pembayaran, 
+                            hubungi admin atau gunakan Midtrans simulator.
+                        </p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- BUTTONS -->
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'payments:status' payment.id %}" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-repeat"></i> Refresh Status Pembayaran
+                        </a>
+                        <a href="{% url 'registration:check_status' %}" class="btn btn-secondary">
+                            <i class="bi bi-search"></i> Cek Status Pendaftaran
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- REGISTRATION INFO -->
+                    <div class="alert alert-light mt-4 mb-0">
+                        <small>
+                            <strong>Nomor Pendaftaran:</strong> 
+                            <span class="text-primary">{{ registration.registration_number }}</span><br>
+                            <strong>Nama:</strong> {{ registration.full_name }}
+                        </small>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <!-- CONTACT HELP -->
+            <div class="card mt-3 border-info">
+                <div class="card-body">
+                    <h6 class="text-info">
+                        <i class="bi bi-headset"></i> Butuh Bantuan?
+                    </h6>
+                    <p class="mb-2 small">Jika mengalami kendala dalam pembayaran:</p>
+                    <div class="d-grid gap-2">
+                        <a href="https://wa.me/6281234567890?text=Halo%20Admin,%20saya%20butuh%20bantuan%20pembayaran%20PPDB.%20Nomor%20Pendaftaran:%20{{ registration.registration_number }}" 
+                           target="_blank" class="btn btn-sm btn-success">
+                            <i class="bi bi-whatsapp"></i> Chat WhatsApp Admin
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Copy VA Script -->
+<script>
+function copyVA() {
+    const vaNumber = "{{ payment.va_number }}";
+    navigator.clipboard.writeText(vaNumber).then(() => {
+        alert("Nomor VA berhasil disalin: " + vaNumber);
+    }).catch(err => {
+        // Fallback untuk browser lama
+        const textarea = document.createElement('textarea');
+        textarea.value = vaNumber;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert("Nomor VA berhasil disalin: " + vaNumber);
+    });
+}
+</script>
+{% endblock %}

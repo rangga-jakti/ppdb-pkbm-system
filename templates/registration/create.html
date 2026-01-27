@@ -1,0 +1,184 @@
+{% extends 'base.html' %} {% block title %}Pendaftaran PPDB PKBM CIPTA TUNAS
+KARYA{% endblock %} {% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="text-center mb-4">
+        <h2>
+          <i class="bi bi-file-earmark-plus"></i> Formulir Pendaftaran PPDB
+        </h2>
+        <p class="text-muted">
+          Tahun Ajaran: <strong>{{ academic_year }}</strong>
+        </p>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <form method="post" id="registrationForm">
+            {% csrf_token %}
+            <h5 class="border-bottom pb-2 mb-3">Data Pribadi</h5>
+            <div class="mb-3">
+              <label class="form-label"
+                >Nama Lengkap <span class="text-danger">*</span></label
+              >
+              {{ form.full_name }}
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label"
+                  >NIK <span class="text-danger">*</span></label
+                >
+                {{ form.nik }}
+                <small class="text-muted">16 digit</small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">NISN</label>
+                {{ form.nisn }}
+                <small class="text-muted">10 digit</small>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label"
+                  >Tempat Lahir <span class="text-danger">*</span></label
+                >
+                {{ form.birth_place }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label"
+                  >Tanggal Lahir <span class="text-danger">*</span></label
+                >
+                {{ form.birth_date }}
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label"
+                  >Jenis Kelamin <span class="text-danger">*</span></label
+                >
+                {{ form.gender }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label"
+                  >Agama <span class="text-danger">*</span></label
+                >
+                {{ form.religion }}
+              </div>
+            </div>
+            <h5 class="border-bottom pb-2 mb-3 mt-4">Kontak</h5>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Email</label>
+                {{ form.contact_email }}
+                <small class="text-muted">Tulis "-" jika tidak ada</small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label"
+                  >No. HP <span class="text-danger">*</span></label
+                >
+                {{ form.contact_phone }}
+              </div>
+            </div>
+            <h5 class="border-bottom pb-2 mb-3 mt-4">Pendidikan</h5>
+            <div class="mb-3">
+              <label class="form-label"
+                >Pilihan Program <span class="text-danger">*</span></label
+              >
+              {{ form.program_choice }}
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-8">
+                <label class="form-label">Asal Sekolah</label>
+                {{ form.previous_school }}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Tahun Lulus</label>
+                {{ form.graduation_year }}
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">NPSN</label>
+              {{ form.previous_school_npsn }}
+              <small class="text-muted">8 digit</small>
+            </div>
+            <h5 class="border-bottom pb-2 mb-3 mt-4">Alamat</h5>
+            <div class="mb-3">
+              <label class="form-label"
+                >Alamat Lengkap <span class="text-danger">*</span></label
+              >
+              {{ form.address }}
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label class="form-label"
+                  >Kota <span class="text-danger">*</span></label
+                >
+                {{ form.city }}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label"
+                  >Provinsi <span class="text-danger">*</span></label
+                >
+                {{ form.province }}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Kode Pos</label>
+                {{ form.postal_code }}
+              </div>
+            </div>
+            <h5 class="border-bottom pb-2 mb-3 mt-4">Data Orang Tua</h5>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label"
+                  >Nama Ayah <span class="text-danger">*</span></label
+                >
+                {{ form.father_name }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label"
+                  >Pekerjaan Ayah <span class="text-danger">*</span></label
+                >
+                {{ form.father_occupation }}
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label"
+                  >Nama Ibu <span class="text-danger">*</span></label
+                >
+                {{ form.mother_name }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label"
+                  >Pekerjaan Ibu <span class="text-danger">*</span></label
+                >
+                {{ form.mother_occupation }}
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label"
+                >No. HP Orang Tua <span class="text-danger">*</span></label
+              >
+              {{ form.parent_phone }}
+            </div>
+            <div class="mt-4">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-save"></i> Lanjutkan ke Upload Dokumen
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="text-center mt-4">
+        <p class="text-muted">
+          Sudah punya nomor pendaftaran?
+          <a href="{% url 'registration:check_status' %}"
+            >Cek Status Pendaftaran</a
+          >
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

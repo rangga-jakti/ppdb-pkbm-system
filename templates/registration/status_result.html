@@ -1,0 +1,247 @@
+
+{% extends "base.html" %}
+{% block title %}Status Pendaftaran{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i> Status Pendaftaran
+                    </h5>
+                </div>
+                <div class="card-body">
+                    
+                    <!-- REGISTRATION NUMBER & NAME -->
+                    <div class="mb-4 text-center">
+                        <h3 class="text-primary">{{ registration.registration_number }}</h3>
+                        <p class="text-muted mb-0">{{ registration.full_name }}</p>
+                    </div>
+
+                    {# ================= PAYMENT EXPIRED HANDLING ================= #}
+
+                    {% if registration.status == 'PAYMENT_EXPIRED' %}
+                    <div class="alert alert-danger text-center py-4 mb-4">
+                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
+                        <h4 class="mt-3 mb-2">PEMBAYARAN KADALUARSA</h4>
+                        <p class="mb-2">
+                            Pendaftaran Anda tidak dapat dilanjutkan karena pembayaran telah melewati
+                            batas waktu <strong>24 jam</strong>.
+                        </p>
+                        <p class="mb-3">
+                            <strong>Silakan melakukan pendaftaran ulang</strong> untuk melanjutkan proses PPDB.
+                        </p>
+                        <a href="{% url 'registration:create' %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-arrow-clockwise"></i> Daftar Ulang
+                        </a>
+                    </div>
+
+                    {% elif payment and payment.status == 'EXPIRED' %}
+                    <div class="alert alert-warning text-center py-3 mb-4">
+                        <i class="bi bi-clock-history" style="font-size: 2.5rem;"></i>
+                        <h5 class="mt-3 mb-2">VIRTUAL ACCOUNT KADALUARSA</h5>
+                        <p class="mb-0">
+                            Nomor Virtual Account sudah tidak berlaku.
+                            <br>
+                            Silakan hubungi panitia PPDB untuk mendapatkan bantuan lebih lanjut.
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    
+                    <!-- STATUS BADGE -->
+                    <div class="alert 
+                        {% if registration.status == 'VERIFIED' %}alert-success
+                        {% elif registration.status == 'PAID' %}alert-warning
+                        {% elif registration.status == 'REJECTED' %}alert-danger
+                        {% elif registration.status == 'SUBMITTED' %}alert-info
+                        {% else %}alert-secondary
+                        {% endif %} text-center py-4">
+                        
+                        {% if registration.status == 'VERIFIED' %}
+                            <!-- DITERIMA -->
+                            <i class="bi bi-check-circle-fill" style="font-size: 3rem;"></i>
+                            <h4 class="mt-3 mb-2">DITERIMA</h4>
+                            <p class="mb-0">Selamat! Pendaftaran Anda telah diverifikasi dan diterima.</p>
+                            {% if registration.verified_at %}
+                            <hr>
+                            <small class="text-muted">
+                                Diverifikasi pada: {{ registration.verified_at|date:"d F Y, H:i" }} WIB
+                            </small>
+                            {% endif %}
+                            
+                        {% elif registration.status == 'PAID' %}
+                            <!-- MENUNGGU VERIFIKASI -->
+                            <i class="bi bi-clock-history" style="font-size: 3rem;"></i>
+                            <h4 class="mt-3 mb-2">MENUNGGU VERIFIKASI</h4>
+                            <p class="mb-0">Pembayaran telah diterima. Pendaftaran Anda sedang dalam proses verifikasi oleh panitia.</p>
+                            <hr>
+                            <small class="text-muted">
+                                Harap menunggu, proses verifikasi maksimal 3x24 jam kerja.
+                            </small>
+                            
+                        {% elif registration.status == 'REJECTED' %}
+                            <!-- DITOLAK -->
+                            <i class="bi bi-x-circle-fill" style="font-size: 3rem;"></i>
+                            <h4 class="mt-3 mb-2">DITOLAK</h4>
+                            <p class="mb-0">Maaf, pendaftaran Anda ditolak.</p>
+                            {% if registration.verification_notes %}
+                            <hr>
+                            <div class="alert alert-light mt-2 mb-0">
+                                <strong>Alasan Penolakan:</strong><br>
+                                {{ registration.verification_notes }}
+                            </div>
+                            {% endif %}
+                            <hr>
+                            <small class="text-muted">
+                                Untuk informasi lebih lanjut, silakan hubungi panitia PPDB.
+                            </small>
+                            
+                        {% elif registration.status == 'SUBMITTED' %}
+                            <!-- MENUNGGU PEMBAYARAN -->
+                            <i class="bi bi-hourglass-split" style="font-size: 3rem;"></i>
+                            <h4 class="mt-3 mb-2">MENUNGGU PEMBAYARAN</h4>
+                            <p class="mb-0">Pendaftaran berhasil disubmit. Silakan selesaikan pembayaran untuk melanjutkan proses verifikasi.</p>
+                            {% if payment %}
+                            <hr>
+                            <a href="{% url 'payments:instructions' payment.id %}" class="btn btn-success btn-lg mt-2">
+                                <i class="bi bi-credit-card"></i> Lihat Instruksi Pembayaran
+                            </a>
+                            {% else %}
+                            <hr>
+                            <small class="text-danger">Payment information not found. Please contact admin.</small>
+                            {% endif %}
+                            
+                        {% elif registration.status == 'DRAFT' %}
+                            <!-- DRAFT -->
+                            <i class="bi bi-pencil-square" style="font-size: 3rem;"></i>
+                            <h4 class="mt-3 mb-2">DRAFT - Belum Submit</h4>
+                            <p class="mb-0">Pendaftaran belum disubmit. Silakan lengkapi data dan dokumen Anda.</p>
+                            <hr>
+                            <small class="text-muted">
+                                Upload semua dokumen wajib (KTP, KK, Akta) dan submit untuk melanjutkan.
+                            </small>
+                            
+                        {% else %}
+                            <!-- STATUS LAIN -->
+                            <i class="bi bi-question-circle" style="font-size: 3rem;"></i>
+                            <h4 class="mt-3 mb-2">{{ registration.get_status_display }}</h4>
+                            <p class="mb-0">Status pendaftaran Anda.</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- DETAIL PENDAFTARAN -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="bi bi-person-badge"></i> Detail Pendaftaran
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm table-borderless mb-0">
+                                <tr>
+                                    <td width="40%"><strong>Nomor Pendaftaran:</strong></td>
+                                    <td class="text-primary">{{ registration.registration_number }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Nama Lengkap:</strong></td>
+                                    <td>{{ registration.full_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Program Pilihan:</strong></td>
+                                    <td>{{ registration.get_program_choice_display }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Email:</strong></td>
+                                    <td>{{ registration.contact_email }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>No. HP:</strong></td>
+                                    <td>{{ registration.contact_phone }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Tanggal Daftar:</strong></td>
+                                    <td>{{ registration.created_at|date:"d F Y, H:i" }} WIB</td>
+                                </tr>
+                                {% if registration.submitted_at %}
+                                <tr>
+                                    <td><strong>Tanggal Submit:</strong></td>
+                                    <td>{{ registration.submitted_at|date:"d F Y, H:i" }} WIB</td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- INFORMASI PEMBAYARAN -->
+                    {% if payment %}
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="bi bi-credit-card"></i> Informasi Pembayaran
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-2">
+                                <strong>Status Pembayaran:</strong> 
+                                {% if payment.status == 'PAID' %}
+                                    <span class="badge bg-success">LUNAS</span>
+                                {% elif payment.status == 'PENDING' %}
+                                    <span class="badge bg-warning text-dark">MENUNGGU PEMBAYARAN</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ payment.get_status_display }}</span>
+                                {% endif %}
+                            </p>
+                            
+                            {% if payment.status == 'PAID' %}
+                                <p class="mb-0">
+                                    <strong>Tanggal Pembayaran:</strong><br>
+                                    {{ payment.paid_at|date:"d F Y, H:i" }} WIB
+                                </p>
+                                <p class="mb-0 mt-2">
+                                    <strong>Jumlah:</strong><br>
+                                    Rp {{ payment.total_amount|floatformat:0 }}
+                                </p>
+                            {% else %}
+                                <p class="mb-2">
+                                    <strong>Jumlah yang Harus Dibayar:</strong><br>
+                                    <span class="text-success fs-5">Rp {{ payment.total_amount|floatformat:0 }}</span>
+                                </p>
+                                <a href="{% url 'payments:instructions' payment.id %}" class="btn btn-success">
+                                    <i class="bi bi-credit-card"></i> Lihat Instruksi Pembayaran
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- ACTION BUTTONS -->
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'registration:check_status' %}" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Cek Status Lain
+                        </a>
+                        <a href="/" class="btn btn-outline-secondary">
+                            <i class="bi bi-house"></i> Kembali ke Beranda
+                        </a>
+                    </div>
+                    
+                    <!-- HELP SECTION -->
+                    <div class="alert alert-light mt-3 mb-0">
+                        <small>
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Butuh Bantuan?</strong><br>
+                            Hubungi panitia PPDB melalui WhatsApp: 
+                            <a href="https://wa.me/6281234567890?text=Halo%20Admin,%20saya%20butuh%20bantuan.%20Nomor%20Pendaftaran:%20{{ registration.registration_number }}" 
+                               target="_blank" class="alert-link">
+                                0812-3456-7890
+                            </a>
+                        </small>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

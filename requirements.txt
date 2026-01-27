@@ -1,0 +1,66 @@
+# =============================================================================
+# PPDB SYSTEM - PRODUCTION REQUIREMENTS
+# =============================================================================
+# File ini untuk production deployment.
+# Untuk development, gunakan: requirements/development.txt
+# =============================================================================
+
+# Core Django
+Django==5.0.1
+psycopg2-binary==2.9.9
+
+# Environment & Configuration
+python-decouple==3.8
+django-environ==0.11.2
+
+# Database & ORM
+django-model-utils==4.3.1
+
+# Forms & Validation
+django-crispy-forms==2.1
+crispy-bootstrap5==2024.2
+
+# File Upload & Image Processing
+Pillow==10.2.0
+django-cleanup==8.0.0
+python-magic-bin==0.4.14  # Windows only - for python-magic
+
+# Security
+django-cors-headers==4.3.1
+django-csp==3.8
+
+# Timezone
+pytz==2024.1
+
+# Utilities
+python-slugify==8.0.1
+
+# WSGI Server
+gunicorn==21.2.0
+gevent==24.2.1
+
+# Background Tasks
+celery==5.3.6
+redis==5.0.1
+
+# Monitoring & Logging
+sentry-sdk==1.39.2
+django-log-request-id==2.1.0
+
+# Performance
+django-redis==5.4.0
+
+# Payment Gateway
+midtransclient==1.4.0
+requests==2.31.0
+httpx==0.26.0
+cryptography==42.0.0
+
+# Excel Export (untuk dashboard)
+openpyxl==3.1.2
+
+django-ratelimit==4.1.0
+
+whitenoise==6.6.0
+
+dj-database-url==2.1.0

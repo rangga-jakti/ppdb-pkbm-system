@@ -1,0 +1,13 @@
+# Midtrans (Recommended untuk Indonesia)
+midtransclient==1.4.0
+
+# Xendit (Alternative)
+xendit-python>=7.0.0
+
+
+# HTTP Client
+requests==2.31.0
+httpx==0.26.0
+
+# Cryptography (untuk signature verification)
+cryptography==42.0.0

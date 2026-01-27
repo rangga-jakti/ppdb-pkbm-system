@@ -1,0 +1,220 @@
+New-Item -ItemType Directory -Force -Path templates\registration\staff | Out-Null
+
+@'
+{% extends "base.html" %}
+{% block title %}Staff Dashboard - PPDB PKBM CIPTA TUNAS KARYA{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-speedometer2"></i> Dashboard Staff PPDB</h2>
+                <div>
+                    <a href="{% url 'registration:staff_list' %}" class="btn btn-primary">
+                        <i class="bi bi-list-ul"></i> Lihat Semua Pendaftaran
+                    </a>
+                    <a href="{% url 'registration:staff_export' %}" class="btn btn-success">
+                        <i class="bi bi-download"></i> Export Excel
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-2">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <h3 class="mb-0">{{ stats.total }}</h3>
+                            <small>Total Pendaftaran</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-secondary text-white">
+                        <div class="card-body">
+                            <h3 class="mb-0">{{ stats.draft }}</h3>
+                            <small>Draft</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <h3 class="mb-0">{{ stats.submitted }}</h3>
+                            <small>Submitted</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-warning text-dark">
+                        <div class="card-body">
+                            <h3 class="mb-0">{{ stats.paid }}</h3>
+                            <small>Perlu Verifikasi</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <h3 class="mb-0">{{ stats.verified }}</h3>
+                            <small>Diterima</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-danger text-white">
+                        <div class="card-body">
+                            <h3 class="mb-0">{{ stats.rejected }}</h3>
+                            <small>Ditolak</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-warning">
+                            <h5 class="mb-0">
+                                <i class="bi bi-clock-history"></i> 
+                                Menunggu Verifikasi ({{ stats.paid }})
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            {% if recent_paid %}
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Nomor</th>
+                                            <th>Nama</th>
+                                            <th>Program</th>
+                                            <th>Tanggal</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for reg in recent_paid %}
+                                        <tr>
+                                            <td>{{ reg.registration_number }}</td>
+                                            <td>{{ reg.full_name }}</td>
+                                            <td>{{ reg.get_program_choice_display }}</td>
+                                            <td>{{ reg.submitted_at|date:"d/m/Y H:i" }}</td>
+                                            <td>
+                                                <a href="{% url 'registration:staff_detail' reg.id %}" class="btn btn-sm btn-primary">
+                                                    <i class="bi bi-eye"></i> Verifikasi
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="p-3 text-center text-muted">
+                                <i class="bi bi-inbox"></i> Tidak ada pendaftaran yang perlu diverifikasi
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% if stats.paid > 10 %}
+                        <div class="card-footer text-center">
+                            <a href="{% url 'registration:staff_list' %}?status=PAID" class="btn btn-sm btn-outline-primary">
+                                Lihat Semua ({{ stats.paid }})
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-check-circle"></i> 
+                                Terakhir Diverifikasi
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            {% if recent_verified %}
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Nomor</th>
+                                            <th>Nama</th>
+                                            <th>Program</th>
+                                            <th>Tanggal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for reg in recent_verified %}
+                                        <tr>
+                                            <td>{{ reg.registration_number }}</td>
+                                            <td>{{ reg.full_name }}</td>
+                                            <td>{{ reg.get_program_choice_display }}</td>
+                                            <td>{{ reg.verified_at|date:"d/m/Y H:i" }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="p-3 text-center text-muted">
+                                <i class="bi bi-inbox"></i> Belum ada yang diverifikasi
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Program Distribution -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-bar-chart"></i> 
+                                Distribusi Program
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Program</th>
+                                            <th>Jumlah</th>
+                                            <th>Persentase</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for prog in program_stats %}
+                                        <tr>
+                                            <td>{{ prog.program_choice }}</td>
+                                            <td>{{ prog.count }}</td>
+                                            <td>
+                                                <div class="progress">
+                                                    <div class="progress-bar" role="progressbar" 
+                                                         style="width: {% widthratio prog.count stats.total 100 %}%">
+                                                        {% widthratio prog.count stats.total 100 %}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+'@ | Out-File -FilePath templates\registration\staff\dashboard.html -Encoding UTF8
+
+Write-Host "dashboard.html created!" -ForegroundColor Green

@@ -1,0 +1,76 @@
+{% extends 'base.html' %} {% block title %}Verifikasi Pendaftaran{% endblock %}
+{% block content %}
+<div class="container">
+  <h2><i class="bi bi-check-circle"></i> Verifikasi Pendaftaran</h2>
+
+  <div class="card mb-3">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">Data Pendaftaran</h5>
+    </div>
+    <div class="card-body">
+      <p>
+        <strong>No. Pendaftaran:</strong> {{ registration.registration_number }}
+      </p>
+      <p><strong>Nama:</strong> {{ registration.full_name }}</p>
+      <p><strong>NISN:</strong> {{ registration.nisn }}</p>
+      <p>
+        <strong>Program:</strong> {{ registration.get_program_choice_display }}
+      </p>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">Dokumen</h5>
+    </div>
+    <div class="card-body">
+      {% for doc in documents %}
+      <p>
+        <i class="bi bi-file-earmark-pdf"></i> {{ doc.get_document_type_display
+        }}
+        <a
+          href="{{ doc.file.url }}"
+          target="_blank"
+          class="btn btn-sm btn-outline-primary"
+          >Lihat</a
+        >
+      </p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">Catatan Verifikasi (Opsional)</label>
+          <textarea name="notes" class="form-control" rows="3"></textarea>
+        </div>
+
+        <button
+          type="submit"
+          name="action"
+          value="approve"
+          class="btn btn-success"
+        >
+          <i class="bi bi-check-circle"></i> Setujui
+        </button>
+        <button
+          type="submit"
+          name="action"
+          value="reject"
+          class="btn btn-danger"
+        >
+          <i class="bi bi-x-circle"></i> Tolak
+        </button>
+        <a
+          href="{% url 'dashboard:registration_list' %}"
+          class="btn btn-secondary"
+          >Batal</a
+        >
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+@'
+{% extends "base.html" %}
+{% block title %}Simulate Payment{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm mt-4 border-warning">
+        <div class="card-header bg-warning">
+          <h5 class="mb-0"><i class="bi bi-wrench"></i> TESTING - Payment Simulator</h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle"></i>
+            <strong>TESTING MODE</strong> - Halaman ini hanya untuk testing. Di production, pembayaran akan otomatis via Midtrans webhook.
+          </div>
+          
+          <h6>Payment Details:</h6>
+          <table class="table table-sm">
+            <tr>
+              <td><strong>Order ID:</strong></td>
+              <td>{{ payment.gateway_order_id }}</td>
+            </tr>
+            <tr>
+              <td><strong>VA Number:</strong></td>
+              <td>{{ payment.va_number }}</td>
+            </tr>
+            <tr>
+              <td><strong>Amount:</strong></td>
+              <td>Rp {{ payment.total_amount|floatformat:0 }}</td>
+            </tr>
+            <tr>
+              <td><strong>Status:</strong></td>
+              <td>
+                {% if payment.status == "PAID" %}
+                  <span class="badge bg-success">PAID</span>
+                {% else %}
+                  <span class="badge bg-warning text-dark">{{ payment.status }}</span>
+                {% endif %}
+              </td>
+            </tr>
+          </table>
+          
+          <hr>
+          
+          <h6>Registration Details:</h6>
+          <table class="table table-sm">
+            <tr>
+              <td><strong>Nomor:</strong></td>
+              <td>{{ registration.registration_number }}</td>
+            </tr>
+            <tr>
+              <td><strong>Nama:</strong></td>
+              <td>{{ registration.full_name }}</td>
+            </tr>
+            <tr>
+              <td><strong>Status:</strong></td>
+              <td>
+                {% if registration.status == "PAID" %}
+                  <span class="badge bg-success">{{ registration.get_status_display }}</span>
+                {% elif registration.status == "VERIFIED" %}
+                  <span class="badge bg-primary">{{ registration.get_status_display }}</span>
+                {% elif registration.status == "SUBMITTED" %}
+                  <span class="badge bg-info">{{ registration.get_status_display }}</span>
+                {% else %}
+                  <span class="badge bg-secondary">{{ registration.get_status_display }}</span>
+                {% endif %}
+              </td>
+            </tr>
+          </table>
+          
+          <hr>
+          
+          {% if payment.status == "PENDING" %}
+          <form method="post">
+            {% csrf_token %}
+            <button type="submit" name="action" value="mark_paid" class="btn btn-success btn-lg w-100" onclick="return confirm('Simulate payment as PAID?')">
+              <i class="bi bi-check-circle"></i> Simulate Payment SUCCESS
+            </button>
+          </form>
+          {% else %}
+          <div class="alert alert-success">
+            <i class="bi bi-check-circle"></i> Payment already PAID
+          </div>
+          {% endif %}
+          
+          <div class="d-grid gap-2 mt-3">
+            <a href="{% url 'payments:instructions' payment.id %}" class="btn btn-secondary">
+              <i class="bi bi-arrow-left"></i> Back to Instructions
+            </a>
+            <a href="{% url 'payments:status' payment.id %}" class="btn btn-outline-primary">
+              <i class="bi bi-eye"></i> View Payment Status
+            </a>
+            <a href="{% url 'registration:check_status' %}" class="btn btn-outline-secondary">
+              <i class="bi bi-search"></i> Check Registration Status
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+'@ | Out-File -FilePath templates\payments\simulate.html -Encoding UTF8
+
+Write-Host "simulate.html created!" -ForegroundColor Green

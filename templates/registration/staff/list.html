@@ -1,0 +1,245 @@
+@'
+{% extends "base.html" %}
+{% block title %}Daftar Pendaftaran - Staff{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-list-ul"></i> Daftar Pendaftaran</h2>
+                <div>
+                    <a href="{% url 'registration:staff_dashboard' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Dashboard
+                    </a>
+                    <a href="{% url 'registration:staff_export' %}?status={{ current_status }}" class="btn btn-success">
+                        <i class="bi bi-download"></i> Export Excel
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Filter & Search -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Filter Status</label>
+                            <select name="status" class="form-select">
+                                <option value="">Semua Status</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Filter Program</label>
+                            <select name="program" class="form-select">
+                                <option value="">Semua Program</option>
+                                {% for value, label in program_choices %}
+                                <option value="{{ value }}" {% if current_program == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Cari</label>
+                            <input type="text" name="search" class="form-control" 
+                                   placeholder="Nomor, Nama, NIK, Email..." 
+                                   value="{{ search_query }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-search"></i> Filter
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Bulk Actions -->
+            <form method="post" action="{% url 'registration:staff_bulk_verify' %}" id="bulkForm">
+                {% csrf_token %}
+                
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Bulk Actions:</strong>
+                                <button type="button" class="btn btn-sm btn-success" onclick="bulkAction('bulk_approve')">
+                                    <i class="bi bi-check-circle"></i> Approve Selected
+                                </button>
+                                <button type="button" class="btn btn-sm btn-danger" onclick="bulkReject()">
+                                    <i class="bi bi-x-circle"></i> Reject Selected
+                                </button>
+                            </div>
+                            <div>
+                                <small class="text-muted">Total: {{ paginator.count }} pendaftaran</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Table -->
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="40">
+                                            <input type="checkbox" id="selectAll" class="form-check-input">
+                                        </th>
+                                        <th>Nomor</th>
+                                        <th>Nama</th>
+                                        <th>Program</th>
+                                        <th>Status</th>
+                                        <th>Tanggal Daftar</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for reg in registrations %}
+                                    <tr>
+                                        <td>
+                                            {% if reg.status == "PAID" %}
+                                            <input type="checkbox" name="registration_ids" value="{{ reg.id }}" class="form-check-input reg-checkbox">
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <strong>{{ reg.registration_number }}</strong><br>
+                                            <small class="text-muted">{{ reg.nik }}</small>
+                                        </td>
+                                        <td>
+                                            {{ reg.full_name }}<br>
+                                            <small class="text-muted">{{ reg.contact_phone }}</small>
+                                        </td>
+                                        <td>{{ reg.get_program_choice_display }}</td>
+                                        <td>
+                                            {% if reg.status == "VERIFIED" %}
+                                                <span class="badge bg-success">{{ reg.get_status_display }}</span>
+                                            {% elif reg.status == "PAID" %}
+                                                <span class="badge bg-warning text-dark">{{ reg.get_status_display }}</span>
+                                            {% elif reg.status == "REJECTED" %}
+                                                <span class="badge bg-danger">{{ reg.get_status_display }}</span>
+                                            {% elif reg.status == "SUBMITTED" %}
+                                                <span class="badge bg-info">{{ reg.get_status_display }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ reg.get_status_display }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ reg.created_at|date:"d/m/Y H:i" }}</td>
+                                        <td>
+                                            <a href="{% url 'registration:staff_detail' reg.id %}" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-eye"></i> Detail
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="7" class="text-center py-5">
+                                            <i class="bi bi-inbox fs-1 text-muted"></i>
+                                            <p class="text-muted">Tidak ada data</p>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1&status={{ current_status }}&program={{ current_program }}&search={{ search_query }}">First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&status={{ current_status }}&program={{ current_program }}&search={{ search_query }}">Previous</a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}&status={{ current_status }}&program={{ current_program }}&search={{ search_query }}">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&status={{ current_status }}&program={{ current_program }}&search={{ search_query }}">Last</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Select All
+document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.reg-checkbox');
+    checkboxes.forEach(cb => cb.checked = this.checked);
+});
+
+// Bulk Actions
+function bulkAction(action) {
+    const form = document.getElementById('bulkForm');
+    const checked = document.querySelectorAll('.reg-checkbox:checked');
+    
+    if (checked.length === 0) {
+        alert('Pilih minimal 1 pendaftaran');
+        return;
+    }
+    
+    if (confirm(`Approve ${checked.length} pendaftaran yang dipilih?`)) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'action';
+        input.value = action;
+        form.appendChild(input);
+        form.submit();
+    }
+}
+
+function bulkReject() {
+    const checked = document.querySelectorAll('.reg-checkbox:checked');
+    
+    if (checked.length === 0) {
+        alert('Pilih minimal 1 pendaftaran');
+        return;
+    }
+    
+    const notes = prompt(`Alasan penolakan untuk ${checked.length} pendaftaran:`);
+    if (notes && notes.trim()) {
+        const form = document.getElementById('bulkForm');
+        
+        const actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = 'bulk_reject';
+        form.appendChild(actionInput);
+        
+        const notesInput = document.createElement('input');
+        notesInput.type = 'hidden';
+        notesInput.name = 'bulk_notes';
+        notesInput.value = notes;
+        form.appendChild(notesInput);
+        
+        form.submit();
+    }
+}
+</script>
+{% endblock %}
+'@ | Out-File -FilePath templates\registration\staff\list.html -Encoding UTF8
+
+Write-Host "list.html created!" -ForegroundColor Green
